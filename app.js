@@ -8,6 +8,9 @@ require('dotenv').config();
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
+const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+const PORT = process.env.PORT || 3000;
+
 app.set("view engine", "ejs");
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -34,7 +37,7 @@ app.post("/sign-up", (req, res) => {
                 age
             })
 
-            let token = jwt.sign({email}, "process.env.JWT_SECRET");
+            let token = jwt.sign({email}, JWT_SECRET);
             res.cookie("token", token);
             res.send(createdUser);
         })
@@ -54,7 +57,7 @@ app.post("/sign-in", async (req, res) => {
     const match = await bcrypt.compare(req.body.password, user.password);
     if(!match) return res.send("Invalid email or password!!");
 
-    let token = jwt.sign({email: user.email}, "process.env.JWT_SECRET");
+    let token = jwt.sign({email: user.email}, JWT_SECRET);
 
     res.cookie("token", token);
     res.send("Login Successful!!!!");
@@ -65,4 +68,4 @@ app.get("/logout", (req, res) => {
     res.redirect("/");
 })
 
-app.listen(3000);
+app.listen(PORT);
